@@ -19,7 +19,7 @@ resource "aws_internet_gateway" "igw" {
 
 resource "aws_subnet" "subnet-public" {
   map_public_ip_on_launch = true
-  availability_zone       = element(var.az_name, 0)
+  availability_zone       = element(var.az_names, 0)
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = element(var.subnet_cidr_blocks, 0)
   tags = merge({
@@ -31,7 +31,7 @@ resource "aws_subnet" "subnet-public" {
 
 resource "aws_subnet" "subnet-private" {
   map_public_ip_on_launch = false
-  availability_zone       = element(var.az_name, 1)
+  availability_zone       = element(var.az_names, 1)
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = element(var.subnet_cidr_blocks, 1)
   tags = merge({
@@ -60,12 +60,12 @@ resource "aws_route_table" "public-route-table" {
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.igw.id
-    tags = merge({
-      "Name" = "${local.name_prefix}-PUBLIC-RT"
-      },
-      local.default_tags
-    )
   }
+  tags = merge({
+    "Name" = "${local.name_prefix}-PUBLIC-RT"
+    },
+    local.default_tags
+  )
 }
 
 # Private route table
@@ -74,12 +74,12 @@ resource "aws_route_table" "private-route-table" {
   route {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.nat-gateway.id
-    tags = merge({
-      "Name" = "${local.name_prefix}-PRIVATE-RT"
-      },
-      local.default_tags
-    )
   }
+  tags = merge({
+    "Name" = "${local.name_prefix}-PRIVATE-RT"
+    },
+    local.default_tags
+  )
 }
 
 
@@ -94,12 +94,12 @@ resource "aws_vpc_endpoint" "s3-endpoint" {
 # Associate Route tables with subnet
 
 resource "aws_route_table_association" "public-association" {
-  route_table_id = aws_route_table.public-route.table.id
+  route_table_id = aws_route_table.public-route-table.id
   subnet_id      = aws_subnet.subnet-public.id
 }
 
 resource "aws_route_table_association" "private-association" {
-  route_table_id = aws_route_table.private-route.table.id
+  route_table_id = aws_route_table.private-route-table.id
   subnet_id      = aws_subnet.subnet-private.id
 }
 
@@ -112,7 +112,7 @@ resource "aws_network_acl" "network-acl" {
     action     = "deny"
     cidr_block = "0.0.0.0/0"
     from_port  = 23
-    to         = 23
+    to_port    = 23
   }
 
   ingress {
@@ -121,7 +121,7 @@ resource "aws_network_acl" "network-acl" {
     action     = "allow"
     cidr_block = "0.0.0.0/0"
     from_port  = 0
-    to         = 0
+    to_port    = 0
   }
 
   egress {
@@ -130,7 +130,7 @@ resource "aws_network_acl" "network-acl" {
     action     = "deny"
     cidr_block = "0.0.0.0/0"
     from_port  = 23
-    to         = 23
+    to_port    = 23
   }
 
   egress {
@@ -139,7 +139,7 @@ resource "aws_network_acl" "network-acl" {
     action     = "allow"
     cidr_block = "0.0.0.0/0"
     from_port  = 0
-    to         = 0
+    to_port    = 0
   }
   tags = merge({
     "Name" = "${local.name_prefix}-NETWORK-ACL"
@@ -155,16 +155,16 @@ resource "aws_security_group" "app-alb-sg" {
   name   = "${local.name_prefix}-ALB-SG"
 
   ingress {
-    from_port      = 80
-    to_port        = 80
-    protocol       = "tcp"
-    security_group = [aws_security_group.app-sg.id]
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app-sg.id]
   }
   ingress {
-    from_port      = 443
-    to_port        = 443
-    protocol       = "tcp"
-    security_group = [aws_security_group.app-sg.id]
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app-sg.id]
   }
 
   egress {

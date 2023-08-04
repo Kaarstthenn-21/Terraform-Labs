@@ -25,10 +25,12 @@ variable "az_names" {
 
 variable "vpc_cidr" {
   type = string
+  default = "10.12.0.0/24"
 }
 
 variable "instance_type" {
   type = string
+  default = "t3.xlarge"
 }
 
 variable "subnet_cidr_blocks" {

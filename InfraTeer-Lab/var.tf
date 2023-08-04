@@ -1,11 +1,11 @@
 variable "aws_region" {
-  description = "us-east-1"
+  description = "AWS Region"
   default     = ""
 }
 
 variable "env" {
   type    = string
-  default = "Infra"
+  default = "Dev"
 }
 
 variable "product" {
@@ -18,7 +18,7 @@ variable "dir_type" {
   default = "SimpleAD"
 }
 
-variable "az_name" {
+variable "az_names" {
   type    = list(string)
   default = [""]
 }
@@ -36,39 +36,32 @@ variable "subnet_cidr_blocks" {
   default = [""]
 }
 
-variable "domain_name" {
+variable "temp_windows_user_name" {
+}
 
+variable "temp_windows_user_pass" {
+}
+
+variable "domain_name" {
 }
 
 variable "allocated_storage" {
-
 }
 
 variable "engine_name" {
-
 }
 
 variable "engine_version" {
-
 }
 
-variable "db_instance" {
-
+variable "db_instance_type" {
 }
 
 variable "db_name" {
-
 }
 
 variable "username" {
-
 }
 
 variable "password" {
-
 }
-
-
-
-
-
